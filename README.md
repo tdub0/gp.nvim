@@ -1,11 +1,6 @@
 <!-- panvimdoc-ignore-start -->
 
-<a href="https://github.com/Robitx/gp.nvim/blob/main/LICENSE"><img alt="GitHub" src="https://img.shields.io/github/license/robitx/gp.nvim"></a>
-<a href="https://github.com/Robitx/gp.nvim/stargazers"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/Robitx/gp.nvim"></a>
-<a href="https://github.com/Robitx/gp.nvim/issues"><img alt="GitHub closed issues" src="https://img.shields.io/github/issues-closed/Robitx/gp.nvim"></a>
-<a href="https://github.com/Robitx/gp.nvim/pulls"><img alt="GitHub closed pull requests" src="https://img.shields.io/github/issues-pr-closed/Robitx/gp.nvim"></a>
-<a href="https://github.com/Robitx/gp.nvim/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors-anon/Robitx/gp.nvim"></a>
-<a href="https://github.com/search?q=%2F%5E%5B%5Cs%5D*require%5C%28%5B%27%22%5Dgp%5B%27%22%5D%5C%29%5C.setup%2F+language%3ALua&type=code&p=1"><img alt="Static Badge" src="https://img.shields.io/badge/Use%20in%20the%20Wild-8A2BE2"></a>
+<a href="https://github.com/tdub0/gp.nvim/blob/main/LICENSE"><img alt="GitHub" src="https://img.shields.io/github/license/tdub0/gp.nvim"></a>
 
 # Gp.nvim (GPT prompt) Neovim AI plugin
 
@@ -13,17 +8,12 @@
 
 <br>
 
-**ChatGPT like sessions, Instructable text/code operations, Speech to text and Image generation in your favorite editor.**
+**ChatGPT like sessions and Instructable text/code operations in your favorite editor. This forked version does not contain speech to text or image generation capabilities.**
 
 <p align="left">
 <img src="https://github.com/Robitx/gp.nvim/assets/8431097/cb288094-2308-42d6-9060-4eb21b3ba74c" width="49%">
 <img src="https://github.com/Robitx/gp.nvim/assets/8431097/c538f0a2-4667-444e-8671-13f8ea261be1" width="49%">
 </p>
-
-### Youtube demos
-
-- [5-min-demo](https://www.youtube.com/watch?v=X-cT7s47PLo) (December 2023)
-- [older-5-min-demo](https://www.youtube.com/watch?v=wPDcBnQgNCc) (screen capture, no sound)
 
 # Goals and Features
 
@@ -52,11 +42,6 @@ Trying to keep things as native as possible - reusing and integrating well with 
     finish selected code based on comments in it, etc.)
   - custom instructions per repository with `.gp.md` file  
     (instruct gpt to generate code using certain libs, packages, conventions and so on)
-- **Speech to text support**
-  - a mouth is 2-4x faster than fingers when it comes to outputting words - use it where it makes sense  
-    (dicating comments and notes, asking gpt questions, giving instructions for code operations, ..)
-- **Image generation**
-  - be even less tempted to open the browser with the ability to generate images directly from Neovim
 
 # Install
 
@@ -67,7 +52,7 @@ Snippets for your preferred package manager:
 ```lua
 -- lazy.nvim
 {
-	"robitx/gp.nvim",
+	"tdub0/gp.nvim",
 	config = function()
 		require("gp").setup()
 
@@ -82,7 +67,7 @@ Snippets for your preferred package manager:
 ```lua
 -- packer.nvim
 use({
-    "robitx/gp.nvim",
+    "tdub0/gp.nvim",
     config = function()
         require("gp").setup()
 
@@ -94,16 +79,16 @@ use({
 })
 ```
 
-## 2. OpenAI API key
+## 2. API Key and Host
 
-Make sure you have OpenAI API key. [Get one here](https://platform.openai.com/account/api-keys) and use it in the [4. Configuration](#4-configuration). Also consider setting up [usage limits](https://platform.openai.com/account/billing/limits) so you won't get suprised at the end of the month.
+The defautl configuration expects two environment variables to connect to the intended GPT instance: `AI_API_KEY` with the API key and `AI_API_HOST` with the GPT URL. The configuration setting `openai_api_key` is set to the value of `AI_API_KEY` and `openai_api_endpoint` is set to the value of `AI_API_HOST`.
 
-The OpenAI API key can be passed to the plugin in multiple ways:
+The API key and host values can be passed to the plugin in multiple ways:
 
 | Method                    | Example                                                        | Security Level      |
 | ------------------------- | -------------------------------------------------------------- | ------------------- |
 | hardcoded string          | `openai_api_key: "sk-...",`                                    | Low                 |
-| default env var           | set `OPENAI_API_KEY` environment variable in shell config      | Medium              |
+| default env var           | set `AI_API_KEY` environment variable in shell config      | Medium              |
 | custom env var            | `openai_api_key = os.getenv("CUSTOM_ENV_NAME"),`               | Medium              |
 | read from file            | `openai_api_key = { "cat", "path_to_api_key" },`               | Medium-High         |
 | password manager          | `openai_api_key = { "bw", "get", "password", "OAI_API_KEY" },` | High                |
@@ -114,19 +99,11 @@ If `openai_api_key` is a table, Gp runs it asynchronously to avoid blocking Neov
 
 The core plugin only needs `curl` installed to make calls to OpenAI API and `grep` for ChatFinder. So Linux, BSD and Mac OS should be covered.
 
-Voice commands (`:GpWhisper*`) depend on `SoX` (Sound eXchange) to handle audio recording and processing:
-
-- Mac OS: `brew install sox`
-- Ubuntu/Debian: `apt-get install sox libsox-fmt-mp3`
-- Arch Linux: `pacman -S sox`
-- Redhat/CentOS: `yum install sox`
-- NixOS: `nix-env -i sox`
-
 ## 4. Configuration
 
-Bellow is a linked snippet with the default values, but I suggest starting with minimal config possible (just `openai_api_key` if you don't have `OPENAI_API_KEY` env set up). Defaults change over time to improve things, options might get deprecated and so on - it's better to change only things where the default doesn't fit your needs.
+Below is a linked snippet with the default values, but I suggest starting with minimal config possible (just `openai_api_key` if you don't have `AI_API_KEY` env set up and `openai_api_endpoint` if you don't have `AI_API_HOST` env setup). Defaults change over time to improve things, options might get deprecated and so on - it's better to change only things where the default doesn't fit your needs.
 
-https://github.com/Robitx/gp.nvim/blob/d90816b2e9185202d72f7b1346b6d33b36350886/lua/gp/config.lua#L8-L355
+https://github.com/tdub0/gp.nvim/blob/main/lua/gp/config.lua#L7-L219
 
 # Usage
 
@@ -226,46 +203,6 @@ Provides custom context per repository:
 
 - refer to [Custom Instructions](#custom-instructions) for more details.
 
-## Speech commands
-
-#### `:GpWhisper` <!-- {doc=:GpWhisper}  -->
-
-Transcription replaces the current line, visual selection or range in the current buffer. Use your mouth to ask a question in a chat buffer instead of writing it by hand, dictate some comments for the code, notes or even your next novel..
-
-For the rest of the whisper commands, the transcription is used as an editable prompt for the equivalent non whisper command - `GpWhisperRewrite` dictates instructions for `GpRewrite` etc.
-
-#### `:GpWhisperRewrite` <!-- {doc=:GpWhisperRewrite}  -->
-
-Similar to `:GpRewrite`, but the prompt instruction dialog uses transcribed spoken instructions.
-
-#### `:GpWhisperAppend` <!-- {doc=:GpWhisperAppend}  -->
-
-Similar to `:GpAppend`, but the prompt instruction dialog uses transcribed spoken instructions for adding content after the current line, visual selection, or range.
-
-#### `:GpWhisperPrepend` <!-- {doc=:GpWhisperPrepend}  -->
-
-Similar to `:GpPrepend`, but the prompt instruction dialog uses transcribed spoken instructions for adding content before the current line, selection, or range.
-
-#### `:GpWhisperEnew` <!-- {doc=:GpWhisperEnew}  -->
-
-Similar to `:GpEnew`, but the prompt instruction dialog uses transcribed spoken instructions for opening content in a new buffer within the current window.
-
-#### `:GpWhisperNew` <!-- {doc=:GpWhisperNew}  -->
-
-Similar to `:GpNew`, but the prompt instruction dialog uses transcribed spoken instructions for opening content in a new horizontal split window.
-
-#### `:GpWhisperVnew` <!-- {doc=:GpWhisperVnew}  -->
-
-Similar to `:GpVnew`, but the prompt instruction dialog uses transcribed spoken instructions for opening content in a new vertical split window.
-
-#### `:GpWhisperTabnew` <!-- {doc=:GpWhisperTabnew}  -->
-
-Similar to `:GpTabnew`, but the prompt instruction dialog uses transcribed spoken instructions for opening content in a new tab.
-
-#### `:GpWhisperPopup` <!-- {doc=:GpWhisperPopup}  -->
-
-Similar to `:GpPopup`, but the prompt instruction dialog uses transcribed spoken instructions for displaying content in a pop-up window.
-
 ## Agent commands
 
 #### `:GpNextAgent` <!-- {doc=:GpNextAgent}  -->
@@ -279,20 +216,6 @@ Displays currently used agents for chat and command instructions.
 #### `:GpAgent XY` <!-- {doc=:GpAgent-XY}  -->
 
 Choose a new agent based on its name, listing options based on the current buffer (chat agents if current buffer is a chat and command agents otherwise). The agent setting is persisted on disk across Neovim instances.
-
-## Image commands
-
-#### `:GpImage` <!-- {doc=:GpImage}  -->
-
-Opens a dialog for entering a prompt describing wanted images. When the generation is done it opens dialog for storing the image to the disk.
-
-#### `:GpImageAgent` <!-- {doc=:GpImageAgent}  -->
-
-Displays currently used image agent (configuration).
-
-#### `:GpImageAgent XY` <!-- {doc=:GpImageAgent-XY}  -->
-
-Choose a new "image agent" based on its name. In the context of images, agent is basically a configuration for model, image size, quality and so on. The agent setting is persisted on disk across Neovim instances.
 
 ## Other commands
 
@@ -330,7 +253,7 @@ Use Early return/Guard Clauses pattern to avoid excessive nesting.
 ...
 ```
 
-Here is [another example](https://github.com/Robitx/gp.nvim/blob/main/.gp.md).
+Here is [another example](https://github.com/tdub0/gp.nvim/blob/main/.gp.md).
 
 ## Scripting
 
@@ -441,30 +364,6 @@ vim.keymap.set("v", "<C-g>x", ":<C-u>'<,'>GpContext<cr>", keymapOptions("Visual 
 
 vim.keymap.set({"n", "i", "v", "x"}, "<C-g>s", "<cmd>GpStop<cr>", keymapOptions("Stop"))
 vim.keymap.set({"n", "i", "v", "x"}, "<C-g>n", "<cmd>GpNextAgent<cr>", keymapOptions("Next Agent"))
-
--- optional Whisper commands with prefix <C-g>w
-vim.keymap.set({"n", "i"}, "<C-g>ww", "<cmd>GpWhisper<cr>", keymapOptions("Whisper"))
-vim.keymap.set("v", "<C-g>ww", ":<C-u>'<,'>GpWhisper<cr>", keymapOptions("Visual Whisper"))
-
-vim.keymap.set({"n", "i"}, "<C-g>wr", "<cmd>GpWhisperRewrite<cr>", keymapOptions("Whisper Inline Rewrite"))
-vim.keymap.set({"n", "i"}, "<C-g>wa", "<cmd>GpWhisperAppend<cr>", keymapOptions("Whisper Append (after)"))
-vim.keymap.set({"n", "i"}, "<C-g>wb", "<cmd>GpWhisperPrepend<cr>", keymapOptions("Whisper Prepend (before) "))
-
-vim.keymap.set("v", "<C-g>wr", ":<C-u>'<,'>GpWhisperRewrite<cr>", keymapOptions("Visual Whisper Rewrite"))
-vim.keymap.set("v", "<C-g>wa", ":<C-u>'<,'>GpWhisperAppend<cr>", keymapOptions("Visual Whisper Append (after)"))
-vim.keymap.set("v", "<C-g>wb", ":<C-u>'<,'>GpWhisperPrepend<cr>", keymapOptions("Visual Whisper Prepend (before)"))
-
-vim.keymap.set({"n", "i"}, "<C-g>wp", "<cmd>GpWhisperPopup<cr>", keymapOptions("Whisper Popup"))
-vim.keymap.set({"n", "i"}, "<C-g>we", "<cmd>GpWhisperEnew<cr>", keymapOptions("Whisper Enew"))
-vim.keymap.set({"n", "i"}, "<C-g>wn", "<cmd>GpWhisperNew<cr>", keymapOptions("Whisper New"))
-vim.keymap.set({"n", "i"}, "<C-g>wv", "<cmd>GpWhisperVnew<cr>", keymapOptions("Whisper Vnew"))
-vim.keymap.set({"n", "i"}, "<C-g>wt", "<cmd>GpWhisperTabnew<cr>", keymapOptions("Whisper Tabnew"))
-
-vim.keymap.set("v", "<C-g>wp", ":<C-u>'<,'>GpWhisperPopup<cr>", keymapOptions("Visual Whisper Popup"))
-vim.keymap.set("v", "<C-g>we", ":<C-u>'<,'>GpWhisperEnew<cr>", keymapOptions("Visual Whisper Enew"))
-vim.keymap.set("v", "<C-g>wn", ":<C-u>'<,'>GpWhisperNew<cr>", keymapOptions("Visual Whisper New"))
-vim.keymap.set("v", "<C-g>wv", ":<C-u>'<,'>GpWhisperVnew<cr>", keymapOptions("Visual Whisper Vnew"))
-vim.keymap.set("v", "<C-g>wt", ":<C-u>'<,'>GpWhisperTabnew<cr>", keymapOptions("Visual Whisper Tabnew"))
 ```
 
 ## Whichkey
@@ -502,19 +401,6 @@ require("which-key").register({
         n = { "<cmd>GpNextAgent<cr>", "Next Agent" },
         s = { "<cmd>GpStop<cr>", "GpStop" },
         x = { ":<C-u>'<,'>GpContext<cr>", "Visual GpContext" },
-
-        w = {
-            name = "Whisper",
-            w = { ":<C-u>'<,'>GpWhisper<cr>", "Whisper" },
-            r = { ":<C-u>'<,'>GpWhisperRewrite<cr>", "Whisper Rewrite" },
-            a = { ":<C-u>'<,'>GpWhisperAppend<cr>", "Whisper Append (after)" },
-            b = { ":<C-u>'<,'>GpWhisperPrepend<cr>", "Whisper Prepend (before)" },
-            p = { ":<C-u>'<,'>GpWhisperPopup<cr>", "Whisper Popup" },
-            e = { ":<C-u>'<,'>GpWhisperEnew<cr>", "Whisper Enew" },
-            n = { ":<C-u>'<,'>GpWhisperNew<cr>", "Whisper New" },
-            v = { ":<C-u>'<,'>GpWhisperVnew<cr>", "Whisper Vnew" },
-            t = { ":<C-u>'<,'>GpWhisperTabnew<cr>", "Whisper Tabnew" },
-        },
     },
     -- ...
 }, {
@@ -554,20 +440,7 @@ require("which-key").register({
         n = { "<cmd>GpNextAgent<cr>", "Next Agent" },
         s = { "<cmd>GpStop<cr>", "GpStop" },
         x = { "<cmd>GpContext<cr>", "Toggle GpContext" },
-
-        w = {
-            name = "Whisper",
-            w = { "<cmd>GpWhisper<cr>", "Whisper" },
-            r = { "<cmd>GpWhisperRewrite<cr>", "Whisper Inline Rewrite" },
-            a = { "<cmd>GpWhisperAppend<cr>", "Whisper Append (after)" },
-            b = { "<cmd>GpWhisperPrepend<cr>", "Whisper Prepend (before)" },
-            p = { "<cmd>GpWhisperPopup<cr>", "Whisper Popup" },
-            e = { "<cmd>GpWhisperEnew<cr>", "Whisper Enew" },
-            n = { "<cmd>GpWhisperNew<cr>", "Whisper New" },
-            v = { "<cmd>GpWhisperVnew<cr>", "Whisper Vnew" },
-            t = { "<cmd>GpWhisperTabnew<cr>", "Whisper Tabnew" },
         },
-    },
     -- ...
 }, {
     mode = "n", -- NORMAL mode
@@ -606,19 +479,6 @@ require("which-key").register({
         x = { "<cmd>GpContext<cr>", "Toggle GpContext" },
         s = { "<cmd>GpStop<cr>", "GpStop" },
         n = { "<cmd>GpNextAgent<cr>", "Next Agent" },
-
-        w = {
-            name = "Whisper",
-            w = { "<cmd>GpWhisper<cr>", "Whisper" },
-            r = { "<cmd>GpWhisperRewrite<cr>", "Whisper Inline Rewrite" },
-            a = { "<cmd>GpWhisperAppend<cr>", "Whisper Append (after)" },
-            b = { "<cmd>GpWhisperPrepend<cr>", "Whisper Prepend (before)" },
-            p = { "<cmd>GpWhisperPopup<cr>", "Whisper Popup" },
-            e = { "<cmd>GpWhisperEnew<cr>", "Whisper Enew" },
-            n = { "<cmd>GpWhisperNew<cr>", "Whisper New" },
-            v = { "<cmd>GpWhisperVnew<cr>", "Whisper Vnew" },
-            t = { "<cmd>GpWhisperTabnew<cr>", "Whisper Tabnew" },
-        },
     },
     -- ...
 }, {
@@ -805,5 +665,3 @@ The raw plugin text editing method `Prompt` has seven aprameters:
 
 - `system_template`
   - See [gpt api intro](https://platform.openai.com/docs/guides/chat/introduction)
-- `whisper`
-  - optional string serving as a default for input prompt (for example generated from speech by Whisper)
