@@ -12,9 +12,7 @@ Table of Contents                                  *gp.nvim-table-of-contents*
 3. Usage                                                       |gp.nvim-usage|
   - Chat commands                                      |gp.nvim-chat-commands|
   - Text/Code commands                            |gp.nvim-text/code-commands|
-  - Speech commands                                  |gp.nvim-speech-commands|
   - Agent commands                                    |gp.nvim-agent-commands|
-  - Image commands                                    |gp.nvim-image-commands|
   - Other commands                                    |gp.nvim-other-commands|
   - GpDone autocommand                            |gp.nvim-gpdone-autocommand|
   - Custom instructions                          |gp.nvim-custom-instructions|
@@ -25,8 +23,7 @@ Table of Contents                                  *gp.nvim-table-of-contents*
 5. Extend functionality                         |gp.nvim-extend-functionality|
 
 
-**ChatGPT like sessions, Instructable text/code operations, Speech to text and
-Image generation in your favorite editor.**
+**ChatGPT like sessions and Instructable text/code operations in your favorite editor.**
 
 
 
@@ -50,7 +47,7 @@ reusing and integrating well with the natural features of (Neo)vim.
 - **Infinitely extensible** via hook functions specified as part of the config
     - hooks have access to everything in the plugin and are automatically registered as commands
     - see |gp.nvim-4.-configuration| and |gp.nvim-extend-functionality| sections for details
-- **Minimum dependencies** (`neovim`, `curl`, `grep` and optionally `sox`)
+- **Minimum dependencies** (`neovim`, `curl`, `grep`)
     - zero dependencies on other lua plugins to minimize chance of breakage
 - **ChatGPT like sessions**
     - just good old neovim buffers formated as markdown with autosave and few buffer bound shortcuts
@@ -65,11 +62,6 @@ reusing and integrating well with the natural features of (Neo)vim.
         finish selected code based on comments in it, etc.)
     - custom instructions per repository with `.gp.md` file
         (instruct gpt to generate code using certain libs, packages, conventions and so on)
-- **Speech to text support**
-    - a mouth is 2-4x faster than fingers when it comes to outputting words - use it where it makes sense
-        (dicating comments and notes, asking gpt questions, giving instructions for code operations, ..)
-- **Image generation**
-    - be even less tempted to open the browser with the ability to generate images directly from Neovim
 
 
 ==============================================================================
@@ -143,15 +135,6 @@ Neovim (password managers can take a second or two).
 
 The core plugin only needs `curl` installed to make calls to OpenAI API and
 `grep` for ChatFinder. So Linux, BSD and Mac OS should be covered.
-
-Voice commands (`:GpWhisper*`) depend on `SoX` (Sound eXchange) to handle audio
-recording and processing:
-
-- Mac OS: `brew install sox`
-- Ubuntu/Debian: `apt-get install sox libsox-fmt-mp3`
-- Arch Linux: `pacman -S sox`
-- Redhat/CentOS: `yum install sox`
-- NixOS: `nix-env -i sox`
 
 
 4. CONFIGURATION                                    *gp.nvim-4.-configuration*
@@ -304,71 +287,6 @@ Provides custom context per repository:
 - refer to |gp.nvim-custom-instructions| for more details.
 
 
-SPEECH COMMANDS                                      *gp.nvim-speech-commands*
-
-
-:GpWhisper                                                        *:GpWhisper*
-
-Transcription replaces the current line, visual selection or range in the
-current buffer. Use your mouth to ask a question in a chat buffer instead of
-writing it by hand, dictate some comments for the code, notes or even your next
-novel..
-
-For the rest of the whisper commands, the transcription is used as an editable
-prompt for the equivalent non whisper command - `GpWhisperRewrite` dictates
-instructions for `GpRewrite` etc.
-
-
-:GpWhisperRewrite                                          *:GpWhisperRewrite*
-
-Similar to `:GpRewrite`, but the prompt instruction dialog uses transcribed
-spoken instructions.
-
-
-:GpWhisperAppend                                            *:GpWhisperAppend*
-
-Similar to `:GpAppend`, but the prompt instruction dialog uses transcribed
-spoken instructions for adding content after the current line, visual
-selection, or range.
-
-
-:GpWhisperPrepend                                          *:GpWhisperPrepend*
-
-Similar to `:GpPrepend`, but the prompt instruction dialog uses transcribed
-spoken instructions for adding content before the current line, selection, or
-range.
-
-
-:GpWhisperEnew                                                *:GpWhisperEnew*
-
-Similar to `:GpEnew`, but the prompt instruction dialog uses transcribed spoken
-instructions for opening content in a new buffer within the current window.
-
-
-:GpWhisperNew                                                  *:GpWhisperNew*
-
-Similar to `:GpNew`, but the prompt instruction dialog uses transcribed spoken
-instructions for opening content in a new horizontal split window.
-
-
-:GpWhisperVnew                                                *:GpWhisperVnew*
-
-Similar to `:GpVnew`, but the prompt instruction dialog uses transcribed spoken
-instructions for opening content in a new vertical split window.
-
-
-:GpWhisperTabnew                                            *:GpWhisperTabnew*
-
-Similar to `:GpTabnew`, but the prompt instruction dialog uses transcribed
-spoken instructions for opening content in a new tab.
-
-
-:GpWhisperPopup                                              *:GpWhisperPopup*
-
-Similar to `:GpPopup`, but the prompt instruction dialog uses transcribed
-spoken instructions for displaying content in a pop-up window.
-
-
 AGENT COMMANDS                                        *gp.nvim-agent-commands*
 
 
@@ -389,27 +307,6 @@ Displays currently used agents for chat and command instructions.
 Choose a new agent based on its name, listing options based on the current
 buffer (chat agents if current buffer is a chat and command agents otherwise).
 The agent setting is persisted on disk across Neovim instances.
-
-
-IMAGE COMMANDS                                        *gp.nvim-image-commands*
-
-
-:GpImage                                                            *:GpImage*
-
-Opens a dialog for entering a prompt describing wanted images. When the
-generation is done it opens dialog for storing the image to the disk.
-
-
-:GpImageAgent                                                  *:GpImageAgent*
-
-Displays currently used image agent (configuration).
-
-
-:GpImageAgent XY                                            *:GpImageAgent-XY*
-
-Choose a new "image agent" based on its name. In the context of images, agent
-is basically a configuration for model, image size, quality and so on. The
-agent setting is persisted on disk across Neovim instances.
 
 
 OTHER COMMANDS                                        *gp.nvim-other-commands*
@@ -927,8 +824,6 @@ The raw plugin text editing method `Prompt` has seven aprameters:
           {{command}}     instructions provided by the user
 - `system_template`
     - See gpt api intro <https://platform.openai.com/docs/guides/chat/introduction>
-- `whisper`
-    - optional string serving as a default for input prompt (for example generated from speech by Whisper)
 
 Generated by panvimdoc <https://github.com/kdheepak/panvimdoc>
 
