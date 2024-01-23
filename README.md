@@ -81,7 +81,7 @@ use({
 
 ## 2. API Key and Host
 
-The defautl configuration expects two environment variables to connect to the intended GPT instance: `AI_API_KEY` with the API key and `AI_API_HOST` with the GPT URL. The configuration setting `openai_api_key` is set to the value of `AI_API_KEY` and `openai_api_endpoint` is set to the value of `AI_API_HOST`.
+The default configuration expects two environment variables to connect to the intended GPT instance: `AI_API_KEY` with the API key and `AI_API_HOST` with the GPT URL. The configuration setting `openai_api_key` is set to the value of `AI_API_KEY` and `openai_api_endpoint` is set to the value of `AI_API_HOST`.
 
 The API key and host values can be passed to the plugin in multiple ways:
 
